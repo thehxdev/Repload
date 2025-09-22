@@ -12,22 +12,34 @@ public static class Program
     {
         if (args.Length < 2)
         {
-            Console.WriteLine($"Usage: client ...\n\tupload <path>\n\tresume <uuid> <path>");
+            Console.WriteLine("Not enough arguments\n");
+            Usage();
             return;
         }
 
-        switch (args[0])
+        try
         {
-            case "upload":
-                await UploadHandler(args[1..]);
-                break;
+            switch (args[0])
+            {
+                case "upload":
+                    await UploadHandler(args[1..]);
+                    break;
 
-            case "resume":
-                await ResumeHandler(args[1..]);
-                break;
+                case "resume":
+                    await ResumeHandler(args[1..]);
+                    break;
 
-            default:
-                throw new Exception("invalid command");
+                default:
+                    Console.WriteLine("Invalid command\n");
+                    Usage();
+                    break;
+            }
+        }
+        catch (Exception ex)
+        {
+            // There's nothing to do about any exception. It's better to keep things
+            // simple and let the program die with an error message.
+            Console.WriteLine(ex.Message);
         }
     }
 
@@ -81,8 +93,6 @@ public static class Program
             throw new Exception($"server sent {buffer[0]} response code");
 
         var position = (uint)IPAddress.NetworkToHostOrder(BitConverter.ToInt32(buffer.AsSpan(1, 4)));
-        Console.WriteLine($"Position: {position}");
-
         await IO.CopyFromFileToSocket(sock, filePath, position, UploadProgressCallback);
     }
 
@@ -90,5 +100,12 @@ public static class Program
     {
         // not a nice progress bar on windows because \r also goes to next line :(
         Console.WriteLine($"\rsent {completed} of {total} bytes to socket ({(float)completed / total * 100,5:F1}%)");
+    }
+
+    private static void Usage()
+    {
+        Console.WriteLine(@"Usage: client ...
+    upload <path>
+    resume <uuid> <path>");
     }
 }

@@ -18,8 +18,7 @@ public static class IO
     public static async Task
         CopyFromFileToSocket(Socket socket, FileStream file, ProgressCallback pcb)
     {
-        //var buffer = new byte[64 * 1024];
-        var buffer = new byte[256];
+        var buffer = new byte[4 * 1024];
         uint nsent = (uint)file.Position;
         while (nsent < file.Length)
         {
@@ -36,7 +35,7 @@ public static class IO
     {
         using var file = File.OpenRead(path);
         file.Seek(position, SeekOrigin.Begin);
-        Console.WriteLine($"resuming from {file.Position}");
+        Console.WriteLine($"File position: {file.Position}");
         await CopyFromFileToSocket(socket, file, pcb);
     }
 
