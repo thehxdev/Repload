@@ -98,8 +98,7 @@ public static class Program
 
     private static void UploadProgressCallback(uint total, uint completed)
     {
-        // not a nice progress bar on windows because \r also goes to next line :(
-        Console.WriteLine($"\rsent {completed} of {total} bytes to socket ({(float)completed / total * 100,5:F1}%)");
+        Console.Write($"\rsent {completed} of {total} bytes to socket ({(float)completed / total * 100,5:F1}%)");
     }
 
     private static void Usage()
